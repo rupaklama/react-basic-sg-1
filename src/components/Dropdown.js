@@ -4,6 +4,10 @@ const Dropdown = ({ options, selected, setSelected }) => {
   const [toggle, setToggle] = useState(false);
 
   // note - useRef will always set to NULL on component unmount
+  
+  // note - useRef is to access or get a reference to a DOM elements that current component creates.
+  // eg. If we have multiple DropDown components,
+  // useRef will reference to its individual dom elements within every individual DropDown components.
   const inputRef = useRef();
   console.log("REF", inputRef.current);
 
@@ -17,7 +21,8 @@ const Dropdown = ({ options, selected, setSelected }) => {
       // finding out if the element got clicked is inside this component
       // if it is we don't want Body Listener to do anything
 
-      // note - This will run whenever we click some outside elements on the DOM
+     // note - Important thing to do always when using useRef is
+      // that useRef will always set to NULL on component unmount or when component is not visible.
       // inputRef.current === null - this will throw an error on reading its value again
       if (inputRef.current.contains(e.target)) {
         console.log("Component elements");
@@ -34,8 +39,14 @@ const Dropdown = ({ options, selected, setSelected }) => {
     document.body.addEventListener("click", onBodyClick, { capture: true });
 
     // note - to prevent NULL Error we should REMOVE the event listener using Clean up method
-    // Clean up method will get Call FIRST on render to remove the event listener
-    // BECAUSE WE WANT TO START CLEAN ALWAYS ON RENDER - meaning don't run above Event Listener
+   
+    // note - At some point, DropDown component will unmount/removed from the ui like when navigating to different page
+    // So that point of time, we need to tell addEventListener function stop watching for clicks
+    // The above click addEventListener gets call always even if the DropDown is not visible in the screen
+    // So to avoid this issue, we need to the Event listener to stop watching for clicks
+    // whenever the component is removed from the screen by using Clean UP method.
+    // BECAUSE WE WANT TO START CLEAN ALWAYS ON RE-RENDER - meaning don't run any Current On Going Event Listeners
+    // NOTE - Clean UP method gets CALL automatically whenever the component is about to removed from the screen
 
     return () => {
       console.log("CLEAN UP GOT INVOKE");
